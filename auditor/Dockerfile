@@ -1,9 +1,10 @@
-FROM gradle:7-jdk17-alpine
+FROM gradle:jdk17-jammy
 
-COPY hello /hello
+COPY . /auditor
 
-WORKDIR /hello
+WORKDIR /auditor
 
-RUN gradle installDist
+RUN ./gradlew installDist
 
-CMD ["./app/build/install/app/bin/app"]
+
+CMD ["./build/install/auditor/bin/auditor"]
