@@ -1,13 +1,29 @@
 version: '3.8'
 services:
   auditor:
-    build: .
+    build: ./auditor
     container_name: auditor
     ports:
-      - "5000:5000"
+      - "8000:50051"
+    networks:
+      - rpc
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5  
 
   jogador:
-    build: .
+    build: ./jogador
     container_name: jogador
+    ports:
+      - "8001:50051"
+    networks:
+      - rpc
 
+#rede
+networks:
+  rpc: 
+    driver: bridge
+      
   # docker compose up --scale jogador=3 para dois jogadores

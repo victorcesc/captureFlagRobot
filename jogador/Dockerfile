@@ -1,8 +1,8 @@
 FROM gradle:jdk17-jammy
 
-COPY . /auditor
+COPY . /jogador
 
-WORKDIR /auditor
+WORKDIR /jogador
 
 RUN gradle installDist
 
