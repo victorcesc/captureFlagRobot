@@ -1,4 +1,4 @@
-FROM gradle:jdk17-jammy
+FROM gradle:jdk11-focal
 
 COPY . /jogador
 

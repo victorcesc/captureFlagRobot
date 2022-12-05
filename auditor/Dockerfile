@@ -1,10 +1,9 @@
-FROM gradle:jdk17-jammy
+FROM gradle:jdk11-focal
 
 COPY . /auditor
 
 WORKDIR /auditor
 
-RUN ./gradlew installDist
-
+RUN gradle installDist
 
 CMD ["./build/install/auditor/bin/auditor"]
