@@ -1,0 +1,41 @@
+syntax = "proto3";
+package game;
+import "google/protobuf/timestamp.proto";
+// Para indicar que a compilação deverá gerar múltiplos arquivos .java
+option java_multiple_files = true;
+// Para indicar o nome do pacote das classes Java que serão geradas quando for compilado para ←-
+option java_package = "engtelecom.std.game";
+// Para indicar o nome da classe Java que será gerada na compilação
+option java_outer_classname = "GameProtos";
+// Definição das estruturas de dados para representar uma Pessoa
+message Jogador {
+    //id e nome do jogador
+    int32 id = 1;
+    string nome = 2;
+
+    message Coordenadas {
+        int32 x = 1;
+        int32 y = 2;
+    }
+
+    message Mapa {
+        string dados = 1;
+    }
+    // para indicar que um contato poderá ter vários telefones
+    //repeated NumeroTelefone telefones = 4;
+    repeated Coordenadas coord = 4; 
+
+    repeated Mapa data = 5; 
+    // para registrar quando o contato foi criado
+    google.protobuf.Timestamp last_updated = 6;
+}
+
+
+message Resposta{
+    string resultado = 1;
+}
+// Definição da interface do serviço (métodos que poderão ser invocados)
+service Auditor {
+rpc jogar (Jogador) returns (Resposta) {}
+rpc buscar (Jogador) returns (Jogador){}
+}

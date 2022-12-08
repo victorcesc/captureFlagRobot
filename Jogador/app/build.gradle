@@ -1,0 +1,70 @@
+plugins {
+id 'application'
+id 'java'
+// plugin protoc
+id "com.google.protobuf" version "0.8.19"
+}
+repositories {
+    maven { // The google mirror is less flaky than mavenCentral()
+        url "https://maven-central.storage-download.googleapis.com/maven2/" }
+    mavenCentral()
+}
+
+
+def grpcVersion = '1.51.0' // CURRENT_GRPC_VERSION
+def protobufVersion = '3.21.7'
+def protocVersion = protobufVersion
+// Configuração do plugin protobuf
+protobuf {
+// Baixar o protoc deste repositório
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.20.1"
+    }
+    // Compilador gRPC para java
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:1.46.0" }
+    }
+    // Configuração da tarefa para o compilador gRPC (saída padrão é Java)
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
+// Para indicar para as IDEs onde estão as classes geradas a partir do arquivo .proto
+sourceSets {
+    main {
+        java {
+            srcDirs 'build/generated/source/proto/main/grpc'
+            srcDirs 'build/generated/source/proto/main/java'
+        }
+    }
+}
+dependencies {
+
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    compileOnly "org.apache.tomcat:annotations-api:6.0.53"
+
+    // examples/advanced need this for JsonFormat
+    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
+
+    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+
+    testImplementation "io.grpc:grpc-testing:${grpcVersion}"
+    testImplementation "junit:junit:4.12"
+    testImplementation "org.mockito:mockito-core:3.4.0"
+    // implementation 'io.grpc:grpc-protobuf:1.46.0'
+    // implementation 'io.grpc:grpc-netty-shaded:1.46.0'
+    // runtimeOnly 'io.grpc:grpc-stub:1.46.0'
+    // implementation 'com.google.protobuf:protobuf-java-util:3.20.1'
+    // compileOnly "org.apache.tomcat:annotations-api:6.0.53"
+    // testImplementation 'io.grpc:grpc-testing:1.46.0'
+    // testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    // implementation 'com.google.guava:guava:30.1.1-jre'
+}
+application {
+// Define o nome da classe principal da Aplicação.
+mainClass = 'engtelecom.std.App'
+}
+tasks.named('test') {
+useJUnitPlatform()
+}
