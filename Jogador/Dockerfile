@@ -1,8 +1,8 @@
 FROM gradle:jdk11-focal
 
-ARG PORT
+ARG NOME
 
-ENV PORT_NUMBER=${PORT}
+ENV NOME_JOGADOR=${NOME}
 
 COPY . /Jogador
 
@@ -10,4 +10,4 @@ WORKDIR /Jogador
 
 RUN gradle installDist
 
-CMD .app/build/install/app/bin/app ${PORT_NUMBER}
+CMD .app/build/install/app/bin/app ${NOME_JOGADOR}

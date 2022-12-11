@@ -7,7 +7,7 @@ public class App {
 private static final Logger logger = Logger.getLogger(App.class.getName());
 public static void main(String[] args) throws Exception {
     
-logger.info("Iniciando o servidor na porta :" + args[0]);
+logger.info("Jogo iniciado na porta :" + args[0]);
 // Padrão de projeto Builder. Veja mais em https://java-design-patterns.com/patterns/builder/
 // Iniciando o servidor com a implementação da AgendaImpl
 Server servidor = ServerBuilder.forPort(Integer.parseInt(args[0]))

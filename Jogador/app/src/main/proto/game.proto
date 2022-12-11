@@ -8,34 +8,45 @@ option java_package = "engtelecom.std.game";
 // Para indicar o nome da classe Java que será gerada na compilação
 option java_outer_classname = "GameProtos";
 // Definição das estruturas de dados para representar uma Pessoa
-message Jogador {
-    //id e nome do jogador
-    int32 id = 1;
-    string nome = 2;
-
+message Jogada {
+    //nome do Jogador  e identificador unico
+    string nome = 1;
+    //coordenadas que foram passadas para efetuar a jogada
+    //se coordenadas forem fora de alcance retornar erro
     message Coordenadas {
         int32 x = 1;
         int32 y = 2;
     }
-
-    message Mapa {
-        string dados = 1;
-    }
+    // message Mapa {
+    //     string dados = 1;
+    // }
     // para indicar que um contato poderá ter vários telefones
     //repeated NumeroTelefone telefones = 4;
-    repeated Coordenadas coord = 4; 
+    repeated Coordenadas coord = 2; 
 
-    repeated Mapa data = 5; 
+    // repeated Mapa data = 5; 
     // para registrar quando o contato foi criado
-    google.protobuf.Timestamp last_updated = 6;
+    google.protobuf.Timestamp last_updated = 3;
 }
 
 
 message Resposta{
     string resultado = 1;
 }
+
+message Ingresso{
+    string nome = 1;
+}
+
+
+// message Mapa{
+//     string tamanho = 1;
+//     string data = 2;
+// }
+
 // Definição da interface do serviço (métodos que poderão ser invocados)
 service Auditor {
-rpc jogar (Jogador) returns (Resposta) {}
-rpc buscar (Jogador) returns (Jogador){}
+    rpc jogar (Jogada) returns (Resposta) {}
+    //rpc buscar (Jogada) returns (Jogada){}
+    rpc entrar (Ingresso) returns (Resposta) {}
 }
