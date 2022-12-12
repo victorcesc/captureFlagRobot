@@ -47,10 +47,6 @@ message Ingresso{
     string nome = 1;
 }
 
-message Requisicao{
-    string req = 1;
-}
-
 
 // Definição da interface do serviço (métodos que poderão ser invocados)
 service Auditor {

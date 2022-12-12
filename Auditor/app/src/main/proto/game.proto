@@ -21,15 +21,8 @@ message Jogada {
         int32 x = 1;
         int32 y = 2;
     }
-    // message Mapa {
-    //     string dados = 1;
-    // }
-    // para indicar que um contato poderá ter vários telefones
-    //repeated NumeroTelefone telefones = 4;
+    
     repeated Coordenadas coord = 2; 
-
-    // repeated Mapa data = 5; 
-    // para registrar quando o contato foi criado
     google.protobuf.Timestamp last_updated = 3;
 }
 
@@ -45,10 +38,6 @@ message Resposta{
 
 message Ingresso{
     string nome = 1;
-}
-
-message Requisicao{
-    string req = 1;
 }
 
 

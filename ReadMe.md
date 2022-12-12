@@ -13,6 +13,9 @@ para executar o container auditor default:
 para executar o container auditor com specs:
  - sudo docker build . -t auditor --build-arg PORT=<port> --build-arg PLAYERS=<number>  --build-arg FLAGS=<number> --build-arg MAP=<number>
 
+para compilar o container jogador(modo default):
+  - sudo docker build . -t jogador --build-arg NOME=<nome_jogador>
+
 para compilar o container jogador:
  - sudo docker build . -t jogador --build-arg NOME=<nome_jogador> --build-arg SERVER=<nome_servidor_container> --build-arg PORT=<number>
 
