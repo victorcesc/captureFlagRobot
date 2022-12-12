@@ -10,7 +10,8 @@ option java_outer_classname = "GameProtos";
 // Definição das estruturas de dados para representar uma Pessoa
 message Jogada {
     //nome do Jogador  e identificador unico
-    string nome = 1;
+    int32 id = 1;
+    string nome = 2;
     //coordenadas que foram passadas para efetuar a jogada
     //se coordenadas forem fora de alcance retornar erro
 
@@ -21,19 +22,29 @@ message Jogada {
         int32 x = 1;
         int32 y = 2;
     }
-    
-    repeated Coordenadas coord = 2; 
-    google.protobuf.Timestamp last_updated = 3;
+    // message Mapa {
+    //     string dados = 1;
+    // }
+    // para indicar que um contato poderá ter vários telefones
+    //repeated NumeroTelefone telefones = 4;
+    repeated Coordenadas coord = 3; 
+
+    // repeated Mapa data = 5; 
+    // para registrar quando o contato foi criado
+    google.protobuf.Timestamp last_updated = 4;
 }
 
 
 message Mapa{
     int32 tamanho = 1;
     string dados = 2;
+    string info = 3;
 }
 
 message Resposta{
     int32 id = 1;
+    int32 x = 2;
+    int32 y = 3;
 }
 
 message Ingresso{

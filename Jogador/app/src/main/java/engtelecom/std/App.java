@@ -21,7 +21,7 @@ public class App {
     
 
 //tira o menor caminho do mapa retornado pelo auditor
-public static LinkedList<Cell> caminho(String dados_mapa, int tamanho_mapa, int id_jogador){
+public static LinkedList<Cell> caminho(String dados_mapa, int tamanho_mapa, int id_jogador, int xp, int yp){
 
   //transformar a matrix string em matrix[][]
     // int matrix[][] = {
@@ -49,19 +49,15 @@ public static LinkedList<Cell> caminho(String dados_mapa, int tamanho_mapa, int 
 // 1,2,3,4,5,6 ... = jogadores 
 //onde eu to ?? - talvez ja saiba
 //onde ta a bandeira ??
-int xb=0,xp = 0;
-int yb=0,yp = 0;
+int xb=0;
+int yb=0;
 for ( int i = 0; i < tamanho_mapa; ++i ) {
   for ( int j = 0; j < tamanho_mapa; ++j ) {
       if ( output[i][j] == 66 ) {
           xb = i;
           yb = j;
           //break;
-      }
-      if (output[i][j] == id_jogador){
-          xp = i;
-          yp = j;
-      } 
+      }     
   }
 }
 int [] posb = {xb,yb}; 
@@ -77,8 +73,10 @@ return ShortestPathBetweenCellsBFS.shortestPath(output, posp, posb);
 public static void main(String[] args) throws Exception {
     // Por padrão o gRPC sempre será sobre TLS, como não criamos um certificado digital, forçamos aqui nã
     //o usar TLS
+    boolean tenho_mapa = false;
+    Queue<int []> queue = new LinkedList<>();
     String port = "50051";
-    String server = "localhost:"+port;
+    String server = "auditor:"+port;
     String user = "JogadorX";
     // Criando uma pessoa usando o padrão de projeto Builder
     if (args.length > 0) {
@@ -106,43 +104,67 @@ public static void main(String[] args) throws Exception {
     logger.info("Ingressando no jogo...");
     var resultado = auditorBlockingStub.entrar(ingresso);
     logger.info( "ID JOGADOR : " + resultado.toString());
-
+    logger.info("Coordenadas iniciais recebidas x : "+ resultado.getX() + " y :" +resultado.getY());
+    int x = resultado.getX();
+    int y = resultado.getY();
 //  -- JOGANDO
-    Coordenadas coord = Coordenadas.newBuilder().setX(0).setY(1).build();
-        var jogada = Jogada.newBuilder().setNome(user)
-        .addCoord(coord)
-        .build();      
-    var map = auditorBlockingStub.jogar(jogada);
-    logger.info(map.toString());    
     
-
+    //logger.info(map.toString());    
+    //jogador entra no jogo e pede o mapa e aguarda o mapa vir -- so vem quando o jogo comeca
+    if(!tenho_mapa){
+      while(true){
+        try{
+          Thread.sleep(20000);
+          Coordenadas coord = Coordenadas.newBuilder().setX(0).setY(0).build();//jogada sem valor
+          var jogada = Jogada.newBuilder().setNome(user)
+            .addCoord(coord)
+            .build();      
+          var map = auditorBlockingStub.jogar(jogada);
+          if(!map.getDados().isEmpty()){
+            System.out.println("Mapa chegou!!");
+            tenho_mapa = true;
+            System.out.println(map.getDados().toString());
+            LinkedList<Cell> c = caminho(map.getDados().toString(),map.getTamanho(),resultado.getId(),x,y);
+            System.out.println("Caminho");
+            System.out.println(c);
+            for (int i = 0; i < c.size(); i++) {
+              int xc = c.get(i).getX();
+              int yc = c.get(i).getY();
+              int [] xy = {xc,yc};
+              queue.add(xy);
+            }          
+            break;
+          }
+        }catch (InterruptedException e) {
+          // recommended because catching InterruptedException clears interrupt flag
+          Thread.currentThread().interrupt();
+          // you probably want to quit if the thread is interrupted
+          return;
+        }  
+      }   
+    }    
     // O TEOREMA DA JOGADA INFINITA
     while(true){
       try{
-        Thread.sleep(10000);
-        if(map.getDados().equals("Faltam jogadores no jogo!!")){
-          coord = Coordenadas.newBuilder().setX(0).setY(0).build();//jogada sem valor
-          jogada = Jogada.newBuilder().setNome(user)
-          .addCoord(coord)
-          .build();      
-          map = auditorBlockingStub.jogar(jogada);      
-      }else{
-        
-        LinkedList<Cell> c = caminho(map.getDados().toString(),map.getTamanho(),resultado.getId());
-        System.out.println(c);
-        int x = c.get(1).getX();
-        int y = c.get(1).getY();
-        coord = Coordenadas.newBuilder().setX(x).setY(y).build();
-        jogada = Jogada.newBuilder().setNome(user)
+        Thread.sleep(20000);
+        //colocar cordenadas da proxima jogada por queue        
+        int [] xy = queue.poll();
+        Coordenadas coord = Coordenadas.newBuilder().setX(xy[0]).setY(xy[1]).build();
+        var jogada = Jogada.newBuilder().setNome(user)
         .addCoord(coord)
-        .build();          
-        map = auditorBlockingStub.jogar(jogada);
-        logger.info(map.toString());     
-                    
-        if(map.getDados().equals("Jogador " + user + "pegou a bandeira!")){
+        .build();
+        logger.info("Jogada : x : "+ xy[0] + ",y :" + xy[1]);          
+        var map = auditorBlockingStub.jogar(jogada);
+        logger.info(map.toString());
+        logger.info(map.getInfo());                   
+        if(map.getInfo().equals("O Jogador " + user + " Venceu")){
           logger.info("VENCI!!!!!!!!");
-        }
-      }
+          break;
+        }else if(map.getInfo().indexOf("Venceu") != -1){
+          logger.info("Fim de jogo :"+ map.getInfo() );
+          break;
+        }    
+      
       }catch (InterruptedException e) {
         // recommended because catching InterruptedException clears interrupt flag
         Thread.currentThread().interrupt();
