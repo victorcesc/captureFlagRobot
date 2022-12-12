@@ -80,14 +80,12 @@ public static void main(String[] args) throws Exception {
     String user = "JogadorX";
     // Criando uma pessoa usando o padrão de projeto Builder
     if (args.length > 0) {
-        if ("--help".equals(args[0])) {
-          System.err.println("Usage: [nome [target]]");
-          System.err.println("");
-          System.err.println("  nome    O nome do Jogada pretendido. O padrao é " + user);
-          System.err.println("  target  O ip:porta do servidor auditor que será conectado. O padrao é " + server );
-          System.exit(1);
-        }
+        System.out.println("Nome do jogador escolhido : " + user);
         user = args[0];
+      }else{
+        System.out.println("Jogo iniciado no modo padrao :");
+        System.out.println("Servidor : " + server);
+        System.out.println("Jogador : " + user);
       }
       if (args.length > 1) {
         server = args[1]+ ":" + args[2];
@@ -163,7 +161,11 @@ public static void main(String[] args) throws Exception {
         }else if(map.getInfo().indexOf("Venceu") != -1){
           logger.info("Fim de jogo :"+ map.getInfo() );
           break;
-        }    
+        } 
+        if(map.getInfo().equals("Fim")){
+          logger.info("Fim de jogo, Derrota!");
+          break;
+        }   
       
       }catch (InterruptedException e) {
         // recommended because catching InterruptedException clears interrupt flag
