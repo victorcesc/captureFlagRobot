@@ -77,7 +77,8 @@ return ShortestPathBetweenCellsBFS.shortestPath(output, posp, posb);
 public static void main(String[] args) throws Exception {
     // Por padrão o gRPC sempre será sobre TLS, como não criamos um certificado digital, forçamos aqui nã
     //o usar TLS
-    String server = "auditor:50051";
+    String port = "50051";
+    String server = "localhost:"+port;
     String user = "JogadorX";
     // Criando uma pessoa usando o padrão de projeto Builder
     if (args.length > 0) {
@@ -91,7 +92,7 @@ public static void main(String[] args) throws Exception {
         user = args[0];
       }
       if (args.length > 1) {
-        server = args[1];
+        server = args[1]+ ":" + args[2];
       } 
      var channel = ManagedChannelBuilder.forTarget(server).usePlaintext().build();
 
