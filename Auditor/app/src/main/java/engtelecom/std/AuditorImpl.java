@@ -30,6 +30,7 @@ private int numero_jogadores;
 private int numero_bandeiras;
 private String map;
 private int mapa[][];
+private boolean mapa_montado = false;
 
 
 public void setMap(String map) {
@@ -81,23 +82,23 @@ public AuditorImpl(int max_jogadores, int max_bandeiras, int tamanho_mapa) {
 }
 
 
-
 @Override
 public void entrar(Ingresso request, StreamObserver<Resposta> responseObserver){
     String mensagem = "Jogador " + request.getNome() + " entrou no jogo!!";   
     //verifica se jogador esta no jogo, true = sim, false = nao   
     boolean ingame = this.in_game(request.getNome());
-
+    int id_jogador = 0;
     if(ingame){ 
         mensagem = "O jogador : " + request.getNome() + " ja esta no jogo";    
     }else{
-        //jogador ganha um par de coordenadas no ingresso por sorteio
-        Random rand = new Random();
-        int x = rand.nextInt(getTamanho_mapa());
-        int y = rand.nextInt(getTamanho_mapa());
+        //jogador ganha um par de coordenadas somente quando é alocado no mapa
+        Random r = new Random();
+        int x = r.nextInt(getTamanho_mapa());
+        int y = r.nextInt(getTamanho_mapa());       
         Jogador newplayer = new Jogador(request.getNome(),x,y);
         if(getNumero_jogadores() < getMax_jogadores()){
             this.jogadores.put(getNumero_jogadores(),newplayer);
+            id_jogador = getNumero_jogadores() + 1;
             this.numero_jogadores++;
         }else{
             mensagem = "Numero maximo de jogadores atingido!!!";            
@@ -105,8 +106,8 @@ public void entrar(Ingresso request, StreamObserver<Resposta> responseObserver){
     }
     logger.info(mensagem);
     System.out.println(this.jogadores.toString());
-    Resposta resposta = Resposta.newBuilder().setResultado(mensagem).build();
-    responseObserver.onNext(resposta);
+    Resposta id = Resposta.newBuilder().setId(id_jogador).build();
+    responseObserver.onNext(id);
     responseObserver.onCompleted();
     
     logger.info("Numero de jogadores no momento : " + getNumero_jogadores());
@@ -116,7 +117,6 @@ public void entrar(Ingresso request, StreamObserver<Resposta> responseObserver){
 @Override
 public void jogar(Jogada request, StreamObserver<Mapa> responseObserver) {
     String mensagem = "O jogador " + request.getNome() + " nao pertence a esse jogo!!" ;    
-
     //permitir jogada somente apos todos os jogadores conectados
     if(getNumero_jogadores() != getMax_jogadores()){
         logger.info("Faltam jogadores no jogo!!");
@@ -126,16 +126,35 @@ public void jogar(Jogada request, StreamObserver<Mapa> responseObserver) {
         return;
     }
     logger.info("Jogada solicitada do <"+ request.getNome() + "> e o jogo esta pronto para começar !!");
-    logger.info("Montando mapa ....");
-    if(getNumero_jogadas() == 0){
+    
+    if(getNumero_jogadas() == 0 && !mapa_montado){
+        logger.info("Primeira jogada do jogo !!");              
+        logger.info("Montando mapa ....");
         this.monta_mapa(true);
+        mapa_montado = true;        
     }else{
         this.monta_mapa(false);
+        System.out.println(mapa.toString());
     }
+
     
     logger.info("Processando jogada do :" + request.getNome());
     //verifica se o jogador ta no jogo
     boolean ingame = this.in_game(request.getNome());
+    boolean isplayed = this.is_played(request.getNome());
+    if(!isplayed){
+        logger.info("Primeira vez do " + request.getNome() + " Retornando mapa ...");
+        Play jogada = new Play();
+        jogada.setNome(request.getNome());//setando nome do jogador que efetuou a jogada
+        jogada.setX(request.getCoord(0).getX());//setando coord da jogada
+        jogada.setY(request.getCoord(0).getY());
+        this.jogadas.put(numero_jogadas,jogada);
+        numero_jogadas++;
+        Mapa map = Mapa.newBuilder().setDados(getMap()).setTamanho(getTamanho_mapa()).build();
+        responseObserver.onNext(map);
+        responseObserver.onCompleted();
+        return;
+    }
 
     if(ingame){
         System.out.println("O jogador pertence a esse jogo!");
@@ -143,30 +162,44 @@ public void jogar(Jogada request, StreamObserver<Mapa> responseObserver) {
         Play jogada = new Play();    
         jogada.setNome(request.getNome());//setando nome do jogador que efetuou a jogada
         jogada.setX(request.getCoord(0).getX());//setando coord da jogada
-        jogada.setY(request.getCoord(0).getY());//setando coord da jogada
-        if(this.valida_jogada(request.getNome(),jogada)){
-            this.jogadas.put(numero_jogadas,jogada);
-            mensagem = "A Jogada : X:" + request.getCoord(0).getX()
-            + ",Y:" +request.getCoord(0).getY() + 
-            " do " + request.getNome() + " foi adicionada com sucesso!!";
-            System.out.println(this.jogadas.toString());
-            numero_jogadas++; 
-        }else{
-            mensagem = "Jogada invalida do " + request.getNome();
-        }        
+        jogada.setY(request.getCoord(0).getY());//setando coord da jogada                    
+        this.jogadas.put(numero_jogadas,jogada);
+        numero_jogadas++; 
+
+        mensagem = "A Jogada : X:" + request.getCoord(0).getX()
+        + ",Y:" +request.getCoord(0).getY() + 
+        " do " + request.getNome() + " foi adicionada com sucesso!!";
+        System.out.println(this.jogadas.toString());
+        if(mapa[jogada.getX()][jogada.getY()] == 66){
+          logger.info("Jogador " + request.getNome() + " pegou a bandeira!");
+          logger.info("<<<<<<" + request.getNome() + ">>>> <<<<<VENCEU>>>>>");
+          return;
+        }
         //VALIDAR JOGADA                
-        logger.info(mensagem);
     }
+    //jogada valida e bem sucedida
+    logger.info(mensagem);
+    System.out.println(jogadas.get(0).toString());
     Mapa map = Mapa.newBuilder().setDados(getMap()).setTamanho(getTamanho_mapa()).build();
     responseObserver.onNext(map);
     responseObserver.onCompleted();
 }
 
-
 // logger.info("Montando mapa ....");
 //     this.monta_mapa();
+//verifica se o jogador ja fez uma jogada, se nunca fez, a jogada nao pode ser efetuada
+public boolean is_played(String nome){
+    if(!jogadas.isEmpty()){
+        for(int i=0; i < getNumero_jogadas() ; i++){
+            if (this.jogadas.get(i).getNome().equals(nome)){ 
+                //jogador ja jogou uma vez    
+                return true;                
+            }
+        }
+    }
+    return false;
 
-
+}
 
 public boolean in_game(String nome){
 
@@ -186,6 +219,7 @@ public boolean in_game(String nome){
 
 //TESTAR DEPOIS DE VALIDAR MAPA
 public boolean valida_jogada(String nome_jogador, Play jogada){
+    logger.info("Validando jogada.....");
     String msgx = "", msgy ="";
     jogada.getY();
     boolean validaX = false, validaY = false;
@@ -197,11 +231,11 @@ public boolean valida_jogada(String nome_jogador, Play jogada){
     for(int i=0; i < getNumero_jogadores() ; i++){
         if (this.jogadores.get(i).getNome().equals(nome_jogador)){     
             //jogador esta no jogo           
-            if(this.jogadores.get(i).getX() ==  jogada.getX() || this.jogadores.get(i).getY() ==  jogada.getY()){
+            if(this.jogadores.get(i).getX() ==  jogada.getX() && this.jogadores.get(i).getY() ==  jogada.getY()){
                 System.out.println("Nao se moveu");
             }else{
                 if(this.jogadores.get(i).getX() > 0){
-                    if((jogada.getX() == this.jogadores.get(i).getX() + 1) || (jogada.getX() == this.jogadores.get(i).getX() - 1)){
+                    if((jogada.getY() == this.jogadores.get(i).getY() + 1) || (jogada.getY() == this.jogadores.get(i).getY() - 1)){
                         validaX = true;
                         msgx = "jogada correta : \n jogada x :"+ jogada.getX() + "\n pos atual x :"+this.jogadores.get(i).getX();
                     }else{
@@ -218,7 +252,7 @@ public boolean valida_jogada(String nome_jogador, Play jogada){
                     }
                 }
                 //para y
-                if(this.jogadores.get(i).getX() > 0){
+                if(this.jogadores.get(i).getY() > 0){
                     if((jogada.getY() == this.jogadores.get(i).getY() + 1) || (jogada.getY() == this.jogadores.get(i).getY() - 1)){
                         validaX = true;
                         msgy = "jogada correta : \n jogada y :"+ jogada.getY() + "\n pos atual y :"+this.jogadores.get(i).getY();
@@ -231,7 +265,7 @@ public boolean valida_jogada(String nome_jogador, Play jogada){
                         validaX = true;
                         msgy = "jogada correta : \n jogada y :"+ jogada.getY() + "\n pos atual y :"+this.jogadores.get(i).getY();
                     }else{
-                        msgy = "jogada incorreta : \n jogada x :"+ jogada.getY() + "\n pos atual x :"+this.jogadores.get(i).getY();
+                        msgy = "jogada incorreta : \n jogada y :"+ jogada.getY() + "\n pos atual y :"+this.jogadores.get(i).getY();
                         validaX = false;
                     }
                 }
@@ -254,12 +288,16 @@ public boolean valida_jogada(String nome_jogador, Play jogada){
 public void monta_mapa(boolean first){
     String mapa_str = "";    
     //alocando jogadores
-    for(int i=0; i < getNumero_jogadores() ; i++){
-        mapa[this.jogadores.get(i).getX()][this.jogadores.get(i).getY()] = i+1;
+    
+    for(int i = 0; i < getNumero_jogadores(); i++){
+        if(mapa[this.jogadores.get(i).getX()][this.jogadores.get(i).getY()] == 0){        
+            mapa[this.jogadores.get(i).getX()][this.jogadores.get(i).getY()] = i+1;
+        }
     }
-    //alocando bandeira
-    if(first)
+
+    if(first){
         aloca_bandeiras();
+    }
     //preparando string para enviar
     for(int i = 0; i < getTamanho_mapa();i++){
         for(int j = 0; j < getTamanho_mapa();j++){
@@ -267,8 +305,9 @@ public void monta_mapa(boolean first){
             if(j < getTamanho_mapa() - 1 ){
                 mapa_str = mapa_str + ",";
             }
-        }        
-        mapa_str = mapa_str + ";";
+        }
+        if (i < getTamanho_mapa() - 1 )        
+            mapa_str = mapa_str + ";";
     }
     setMap(mapa_str);
     System.out.println(mapa_str);
@@ -285,7 +324,7 @@ public void aloca_bandeiras(){
             }else{
                mapa[x][y] = 66;
                numero_bandeiras++;
-           }
+            }
         }else{
             aloca_bandeiras();
         }

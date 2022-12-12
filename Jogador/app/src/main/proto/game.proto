@@ -40,13 +40,16 @@ message Mapa{
 }
 
 message Resposta{
-    string resultado = 1;
+    int32 id = 1;
 }
 
 message Ingresso{
     string nome = 1;
 }
 
+message Requisicao{
+    string req = 1;
+}
 
 
 // Definição da interface do serviço (métodos que poderão ser invocados)

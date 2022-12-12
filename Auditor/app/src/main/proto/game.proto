@@ -40,7 +40,7 @@ message Mapa{
 }
 
 message Resposta{
-    string resultado = 1;
+    int32 id = 1;
 }
 
 message Ingresso{
