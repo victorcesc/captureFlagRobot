@@ -80,8 +80,8 @@ public static void main(String[] args) throws Exception {
     String user = "JogadorX";
     // Criando uma pessoa usando o padrão de projeto Builder
     if (args.length > 0) {
-        System.out.println("Nome do jogador escolhido : " + user);
         user = args[0];
+        System.out.println("Nome do jogador escolhido : " + user);        
       }else{
         System.out.println("Jogo iniciado no modo padrao :");
         System.out.println("Servidor : " + server);
@@ -89,6 +89,7 @@ public static void main(String[] args) throws Exception {
       }
       if (args.length > 1) {
         server = args[1]+ ":" + args[2];
+        System.out.println("Servidor escolhido : " + server);
       } 
      var channel = ManagedChannelBuilder.forTarget(server).usePlaintext().build();
 

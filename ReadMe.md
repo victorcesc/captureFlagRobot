@@ -20,13 +20,12 @@ para compilar o container jogador:
  - sudo docker build . -t jogador --build-arg NOME=<nome_jogador> --build-arg SERVER=<nome_servidor_container> --build-arg PORT=<number>
 
 para rodar o auditor
- - sudo docker run --network <nome_rede> auditor
+ - sudo docker run --network <rede> auditor
 para rodar o jogador
  - sudo docker run --network <rede> jogador
 
 
-# nao consegui usar o docker compose
+# nao consegui usar o docker
 # não consegui fazer a classe monitor
-# não consegui fazer o jogador se movimentar no mapa
-# não achei nenhuma possibilidade de um jogador ficar no mesmo lugar que algum outro no mapa(não diz nada sobre isso no projeto)
+
 
