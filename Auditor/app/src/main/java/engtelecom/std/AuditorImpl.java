@@ -3,7 +3,6 @@ import engtelecom.std.game.AuditorGrpc;
 import engtelecom.std.game.Jogada;
 import engtelecom.std.game.Resposta;
 import engtelecom.std.game.Ingresso;
-import engtelecom.std.game.Requisicao;
 import engtelecom.std.game.Mapa;
 
 
