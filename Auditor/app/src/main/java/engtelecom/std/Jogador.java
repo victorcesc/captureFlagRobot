@@ -7,7 +7,7 @@ public class Jogador {
     private int x;
     private int y;
 
-    public Jogador(String nome, int x, int y) {
+    public Jogador(String nome,int x,int y) {
         this.nome = nome;
         this.x = x;
         this.y = y;

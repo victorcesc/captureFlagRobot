@@ -13,6 +13,10 @@ message Jogada {
     string nome = 1;
     //coordenadas que foram passadas para efetuar a jogada
     //se coordenadas forem fora de alcance retornar erro
+
+    //so posso andar  + 1 para x ou +1 para y
+    //no caso de voltar pra posicao seria a mesma logica, -1 para x ou -1 para y
+    //mas nao da de voltar caso tenha 0 em algum dos x,y
     message Coordenadas {
         int32 x = 1;
         int32 y = 2;
@@ -30,6 +34,11 @@ message Jogada {
 }
 
 
+message Mapa{
+    int32 tamanho = 1;
+    string dados = 2;
+}
+
 message Resposta{
     string resultado = 1;
 }
@@ -39,14 +48,9 @@ message Ingresso{
 }
 
 
-// message Mapa{
-//     string tamanho = 1;
-//     string data = 2;
-// }
 
 // Definição da interface do serviço (métodos que poderão ser invocados)
 service Auditor {
-    rpc jogar (Jogada) returns (Resposta) {}
-    //rpc buscar (Jogada) returns (Jogada){}
     rpc entrar (Ingresso) returns (Resposta) {}
+    rpc jogar (Jogada) returns (Mapa) {}
 }
