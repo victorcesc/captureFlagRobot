@@ -3,13 +3,10 @@ package engtelecom.std;
 public class Cell  {
     int x;
     int y;
-    int dist;  	//distance
-    Cell prev;  //parent cell in the path
-    Cell(int x, int y, int dist, Cell prev) {
+   
+    Cell(int x, int y) {
         this.x = x;
-        this.y = y;
-        this.dist = dist;
-        this.prev = prev;
+        this.y = y;        
     }
     
     public int getX() {

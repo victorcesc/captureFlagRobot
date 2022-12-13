@@ -6,7 +6,6 @@ public class App {
 // Serviço de log para registrar as mensagens de depuração, informação, erro, etc.
 private static final Logger logger = Logger.getLogger(App.class.getName());
 public static void main(String[] args) throws Exception {
-    AuditorImpl auditor;
     Server servidor;
 if(args.length < 1 && args.length < 4){
     System.out.println("Jogo iniciado no modo padrao: ");
@@ -14,13 +13,13 @@ if(args.length < 1 && args.length < 4){
     System.out.println("Jogadores max: 2");
     System.out.println("Tamanho do mapa : 4");
     System.out.println("Numero de bandeiras: 1");
-    auditor = new AuditorImpl();
+    AuditorImpl auditor = new AuditorImpl();
     servidor = ServerBuilder.forPort(50051)
     .addService(auditor)
     .build()
     .start();
 }else{
-    auditor = new AuditorImpl(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]));
+    AuditorImpl auditor = new AuditorImpl(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]));
     servidor = ServerBuilder.forPort(Integer.parseInt(args[0]))
         .addService(auditor)
         .build()

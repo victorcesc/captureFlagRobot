@@ -21,19 +21,7 @@ public class App {
     
 
 //tira o menor caminho do mapa retornado pelo auditor
-public static LinkedList<Cell> caminho(String dados_mapa, int tamanho_mapa, int id_jogador, int xp, int yp){
-
-  //transformar a matrix string em matrix[][]
-    // int matrix[][] = {
-    //   { 0, 0, 1, 0},
-    //   { 0, 0, 0, 0},
-    //   { 0, 0, 0, 0},
-    //   { 0, 0, 66, 0} };
-
-    //criar mensagem proto onde envia uma string de mapa
-
-  //String dados_mapa = "0,0,1,0;0,0,0,0;0,0,0,0;0,0,66,0";
-
+public static LinkedList<Cell> caminho(String dados_mapa, int tamanho_mapa, int xp, int yp){
   String lines[] = dados_mapa.split(";");
   int width = lines.length;
   String cells[] = lines[0].split(",");
@@ -45,10 +33,7 @@ public static LinkedList<Cell> caminho(String dados_mapa, int tamanho_mapa, int 
         output[i][j] = Integer.parseInt(cells1[j]);
     }
   }
-// 66 = bandeira
-// 1,2,3,4,5,6 ... = jogadores 
-//onde eu to ?? - talvez ja saiba
-//onde ta a bandeira ??
+
 int xb=0;
 int yb=0;
 for ( int i = 0; i < tamanho_mapa; ++i ) {
@@ -67,16 +52,13 @@ System.out.println(posp[0] + " " + posp[1]);
 
 return ShortestPathBetweenCellsBFS.shortestPath(output, posp, posb);
 
-
-
 }
 public static void main(String[] args) throws Exception {
-    // Por padrão o gRPC sempre será sobre TLS, como não criamos um certificado digital, forçamos aqui nã
-    //o usar TLS
+
     boolean tenho_mapa = false;
     Queue<int []> queue = new LinkedList<>();
     String port = "50051";
-    String server = "auditor:"+port;
+    String server = "localhost:"+port;
     String user = "JogadorX";
     // Criando uma pessoa usando o padrão de projeto Builder
     if (args.length > 0) {
@@ -117,13 +99,13 @@ public static void main(String[] args) throws Exception {
           Coordenadas coord = Coordenadas.newBuilder().setX(0).setY(0).build();//jogada sem valor
           var jogada = Jogada.newBuilder().setNome(user)
             .addCoord(coord)
-            .build();      
+            .build();
           var map = auditorBlockingStub.jogar(jogada);
           if(!map.getDados().isEmpty()){
             System.out.println("Mapa chegou!!");
             tenho_mapa = true;
             System.out.println(map.getDados().toString());
-            LinkedList<Cell> c = caminho(map.getDados().toString(),map.getTamanho(),resultado.getId(),x,y);
+            LinkedList<Cell> c = caminho(map.getDados().toString(),map.getTamanho(),x,y);
             System.out.println("Caminho");
             System.out.println(c);
             for (int i = 0; i < c.size(); i++) {
@@ -131,7 +113,7 @@ public static void main(String[] args) throws Exception {
               int yc = c.get(i).getY();
               int [] xy = {xc,yc};
               queue.add(xy);
-            }          
+            }
             break;
           }
         }catch (InterruptedException e) {
@@ -159,10 +141,11 @@ public static void main(String[] args) throws Exception {
         if(map.getInfo().equals("O Jogador " + user + " Venceu")){
           logger.info("VENCI!!!!!!!!");
           break;
-        }else if(map.getInfo().indexOf("Venceu") != -1){
-          logger.info("Fim de jogo :"+ map.getInfo() );
-          break;
-        } 
+        }
+        // else if(map.getInfo().indexOf("Venceu") != -1){
+        //   logger.info("Fim de jogo :"+ map.getInfo() );
+        //   break;
+        // } 
         if(map.getInfo().equals("Fim")){
           logger.info("Fim de jogo, Derrota!");
           break;
@@ -177,12 +160,6 @@ public static void main(String[] args) throws Exception {
       
     }
 
-// LinkedList<Cell> c = caminho("0,0,66;2,0,0;0,1,0",3,1);
-// System.out.println(c);
-// System.out.println(c.get(1));
-
-    
-      
 
     
     

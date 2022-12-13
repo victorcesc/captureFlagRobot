@@ -11,9 +11,12 @@ import java.util.Scanner;
 
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+import io.grpc.stub.annotations.GrpcGenerated;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 public class AuditorImpl extends AuditorGrpc.AuditorImplBase {
 // Serviço de log para registrar as mensagens de depuração, informação, erro, etc.
 private static final Logger logger = Logger.getLogger(AuditorImpl.class.getName());

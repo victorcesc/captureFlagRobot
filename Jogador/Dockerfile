@@ -1,4 +1,4 @@
-FROM gradle:jdk17-focal
+FROM gradle:jdk19-focal
 
 ARG NOME
 ARG PORT
