@@ -15,7 +15,7 @@
  ``` sudo docker build . -t auditor --build-arg PORT=<port> --build-arg PLAYERS=<number>  --build-arg FLAGS=<number> --build-arg MAP=<number> ```
 
 #### Para executar o container auditor (modo default*):
-``` sudo docker run --name <nome_servidor_container> --network <nome_rede> -p 8000:50051 auditor ```
+``` sudo docker run --name <nome_servidor_container> --network <nome_rede> auditor ```
 
 ## Jogador
 
@@ -33,7 +33,7 @@
 
 * O Modo default para o jogador:
   - nome do jogador padrao : JogadorX
-  - servidor que ira se conectar : localhost:50051
+  - servidor e porta que ira se conectar : localhost:50051
 
 
 
@@ -47,5 +47,5 @@
 
 ## Requisitos não atendidos:
 
-### Processo Auditor atendeu todos os requisitos - não garanto que funcione com mais de 2 jogadores e mais de 1 bandeira
-
+### Processo Auditor não atendeu todos os requisitos - não garanto que funcione com mais de 2 jogadores e mais de 1 bandeira
+### Processo Monitor não é grafico
