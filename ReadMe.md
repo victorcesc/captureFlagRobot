@@ -1,7 +1,8 @@
-## PROJETO FINAL STD
+# PROJETO FINAL STD
 
-*Requer gradle 7.6
-*JAVA 19
+## Requer:
+### gradle 7.6
+### JAVA 19
 
 (ignore os sudos se vc tem o docker instalado localmente como user)
 ### Criando a rede docker necessária:
@@ -36,6 +37,15 @@
 
 
 
-### não consegui fazer a classe monitor
+## Requisitos atendidos:
 
+###  Arquivo Readme.md contém explicações em como executar cada processo para permitir iniciar e observar uma partida
+###  Arquivo Readme.md contém uma lista dos requisitos atendidos e não atendidos
+### Após clonar o repositório, é possível compilar e executar cada projeto de forma individual (auditor,jogador ou monitor) usando o gradle (pode ser com gradle run ou gradle installDist)
+### É possível executar somente o contêiner com o processo auditor
+### É possível executar N contêineres com o processo jogador e esses conseguem conectar corretamente no processo auditor
+
+## Requisitos não atendidos:
+
+### Processo Auditor atendeu todos os requisitos - não garanto que funcione com mais de 2 jogadores e mais de 1 bandeira
 
