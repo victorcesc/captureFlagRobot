@@ -3,6 +3,7 @@
 ## Requer:
 ### gradle 7.6
 ### JAVA 19
+### Docker version 20.10.21, build baeda1f82a
 
 (ignore os sudos se vc tem o docker instalado localmente como user)
 ### Criando a rede docker necessária:
