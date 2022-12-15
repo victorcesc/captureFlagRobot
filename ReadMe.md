@@ -12,19 +12,41 @@
 
 ## Auditor
 
+### Build Auditor:
+
+- Entre na pasta do projeto Auditor
+
+#### Para buildar o container auditor(modo DEFAULT*):
+
+``` sudo docker build . -t auditor ```
+
 #### Para buildar o container auditor com specs:
  ``` sudo docker build . -t auditor --build-arg PORT=<port> --build-arg PLAYERS=<number>  --build-arg FLAGS=<number> --build-arg MAP=<number> ```
 
-#### Para executar o container auditor (modo default*):
+
+### Run Auditor:
+
+#### Para executar o container auditor :
 ``` sudo docker run --name <nome_servidor_container> --network <nome_rede> auditor ```
+
+
+
 
 ## Jogador
 
-#### Para compilar o container jogador(modo default*):
+### Build Jogador
+
+#### Para compilar o container jogador(modo DEFAULT*):
  ``` sudo docker build . -t jogador --build-arg NOME=<nome_jogador> ```
 
 #### Para compilar o container jogador:
- ``` sudo docker build . -t jogador --build-arg NOME=<nome_jogador> --build-arg SERVER=<nome_servidor_container> --build-arg PORT=<number> ```
+ ``` sudo docker build . -t jogador --build-arg NOME=<nome_jogador> --build-arg IP_SERVER=<nome_servidor_container> --build-arg PORT=<number> ```
+
+### Run Jogador
+
+#### Para excecutar o container jogador:
+
+``` sudo docker run --name <nome_container> --network <nome_rede> jogador ```
 
 * O Modo default para o auditor:
   - porta do servidor : 50051
@@ -36,6 +58,8 @@
   - nome do jogador padrao : JogadorX
   - servidor e porta que ira se conectar : localhost:50051
 
+
+* NOTE : para concetar ao auditor utilizando o modo de nomes de container precisa-se criar o jogador em modo custom e adicionar na variavel SERVIDOR o nome do container e não em modo default, como dito acima, o modo default só aceita conexões do localhost.
 
 
 ## Requisitos atendidos:
@@ -50,3 +74,4 @@
 
 ### Processo Auditor não atendeu todos os requisitos - não garanto que funcione com mais de 2 jogadores e mais de 1 bandeira
 ### Processo Monitor não é grafico
+### Só consegui testar o jogo em modo default.
