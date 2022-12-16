@@ -46,11 +46,11 @@ for ( int i = 0; i < tamanho_mapa; ++i ) {
   }
 }
 int [] posb = {xb,yb}; 
-System.out.println(posb[0] + " " + posb[1]);  
+System.out.println("coordenadas bandeira : " + posb[0] + " " + posb[1]);  
 int [] posp = {xp,yp};
-System.out.println(posp[0] + " " + posp[1]);
+System.out.println("coordenadas jogador : " + posp[0] + " " + posp[1]);
 
-return ShortestPathBetweenCellsBFS.shortestPath(output, posp, posb);
+return RoboBurro.shortestPath(output, posp, posb);
 
 }
 public static void main(String[] args) throws Exception {
@@ -90,12 +90,11 @@ public static void main(String[] args) throws Exception {
     int y = resultado.getY();
 //  -- JOGANDO
     
-    //logger.info(map.toString());    
     //jogador entra no jogo e pede o mapa e aguarda o mapa vir -- so vem quando o jogo comeca
     if(!tenho_mapa){
       while(true){
         try{
-          Thread.sleep(20000);
+          Thread.sleep(1500);
           Coordenadas coord = Coordenadas.newBuilder().setX(0).setY(0).build();//jogada sem valor
           var jogada = Jogada.newBuilder().setNome(user)
             .addCoord(coord)
@@ -104,10 +103,8 @@ public static void main(String[] args) throws Exception {
           if(!map.getDados().isEmpty()){
             System.out.println("Mapa chegou!!");
             tenho_mapa = true;
-            System.out.println(map.getDados().toString());
+            System.out.println("Mapa : "+ map.getDados().toString());
             LinkedList<Cell> c = caminho(map.getDados().toString(),map.getTamanho(),x,y);
-            System.out.println("Caminho");
-            System.out.println(c);
             for (int i = 0; i < c.size(); i++) {
               int xc = c.get(i).getX();
               int yc = c.get(i).getY();
@@ -124,10 +121,9 @@ public static void main(String[] args) throws Exception {
         }  
       }   
     }    
-    // O TEOREMA DA JOGADA INFINITA
     while(true){
       try{
-        Thread.sleep(20000);
+        Thread.sleep(1500);
         //colocar cordenadas da proxima jogada por queue        
         int [] xy = queue.poll();
         Coordenadas coord = Coordenadas.newBuilder().setX(xy[0]).setY(xy[1]).build();

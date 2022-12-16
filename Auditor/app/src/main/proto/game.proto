@@ -56,4 +56,5 @@ message Ingresso{
 service Auditor {
     rpc entrar (Ingresso) returns (Resposta) {}
     rpc jogar (Jogada) returns (Mapa) {}
+    rpc mapear (Ingresso) returns (Mapa){} //exclusivo do monitor
 }

@@ -14,6 +14,8 @@ import io.grpc.stub.StreamObserver;
 import io.grpc.stub.annotations.GrpcGenerated;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -24,34 +26,54 @@ private static final Logger logger = Logger.getLogger(AuditorImpl.class.getName(
 // Banco de dados para armazenar todos os contatos
 private Map<Integer, Play> jogadas;
 private Map<Integer, Jogador> jogadores;
+private List<Bandeira> bandeiras;
 private int max_jogadores;
-private int max_bandeiras;
 private int tamanho_mapa; //16 celulas[ matriz 4x4] matriz[3][3] 0123 é o tamanho default
 private int numero_jogadas;
 private int numero_jogadores;
-private int numero_bandeiras;
-private String map;
+private int max_bandeiras;
+private String mapa_s;
 private int mapa[][];
-private boolean mapa_montado = false;
-private int pos_bandeira[][];
-private boolean fim = false;
+
+private boolean mapa_montado;
+
+public boolean isFim() {
+    return fim;
+}
+
+public void setFim(boolean fim) {
+    this.fim = fim;
+}
 
 
-public void setMap(String map) {
-    this.map = map;
+private boolean fim;
+
+
+public void setMap(String mapa_s) {
+    this.mapa_s = mapa_s;
 }
 
 public String getMap() {
-    return map;
+    return mapa_s;
 }
 
 public int getMax_jogadores() {
     return max_jogadores;
 }
 
+
+public List<Bandeira> getBandeiras() {
+    return bandeiras;
+}
+
+public void setBandeiras(List<Bandeira> bandeiras) {
+    this.bandeiras = bandeiras;
+}
+
 public int getMax_bandeiras() {
     return max_bandeiras;
 }
+
 
 public int getTamanho_mapa() {
     return tamanho_mapa;
@@ -72,7 +94,9 @@ public AuditorImpl() {
     this.jogadas = new HashMap<>();
     this.jogadores = new HashMap<>();
     this.mapa = new int[tamanho_mapa][tamanho_mapa];
-    this.pos_bandeira = new int[max_bandeiras][2];
+    this.bandeiras = new LinkedList<>();
+    this.fim = false;
+    this.mapa_montado = false;
 
 }
 
@@ -83,7 +107,9 @@ public AuditorImpl(int max_jogadores, int max_bandeiras, int tamanho_mapa) {
     this.jogadas = new HashMap<>();
     this.jogadores = new HashMap<>();
     this.mapa = new int[tamanho_mapa][tamanho_mapa];
-    this.pos_bandeira = new int[max_bandeiras][2];
+    this.bandeiras = new LinkedList<>();
+    this.fim=false;
+    this.mapa_montado = false;
 }
 
 
@@ -118,21 +144,24 @@ public void entrar(Ingresso request, StreamObserver<Resposta> responseObserver){
     logger.info("Numero de jogadores no momento : " + getNumero_jogadores());
 }
 
+public boolean isEndgame(){
+    return fim;
+}
 
 @Override
 public void jogar(Jogada request, StreamObserver<Mapa> responseObserver) {
     String mensagem = "O jogador " + request.getNome() + " nao pertence a esse jogo!!" ; 
-    Mapa map;   
-    if(fim){
-        map = Mapa.newBuilder().setInfo("Fim").setTamanho(0).build();
-        responseObserver.onNext(map);
+    Mapa map_message;   
+    if(isFim()){
+        map_message = Mapa.newBuilder().setInfo("Fim").setTamanho(0).build();
+        responseObserver.onNext(map_message);
         responseObserver.onCompleted();
         return;
     }else{
         if(getNumero_jogadores() != getMax_jogadores()){
             logger.info("Faltam jogadores no jogo!!");
-            map = Mapa.newBuilder().setInfo("Faltam jogadores no jogo!!").setTamanho(0).build();
-            responseObserver.onNext(map);
+            map_message = Mapa.newBuilder().setInfo("Faltam jogadores no jogo!!").setTamanho(0).build();
+            responseObserver.onNext(map_message);
             responseObserver.onCompleted();
             return;
         }
@@ -143,70 +172,91 @@ public void jogar(Jogada request, StreamObserver<Mapa> responseObserver) {
             logger.info("Montando mapa ....");
             this.monta_mapa(true);
             mapa_montado = true;
-            map = Mapa.newBuilder().setInfo("Mapa montado!").setTamanho(0).build();
-            responseObserver.onNext(map);
+            map_message = Mapa.newBuilder().setInfo("Mapa montado!").setTamanho(0).build();
+            responseObserver.onNext(map_message);
             responseObserver.onCompleted();
             return;        
-        }       
-        System.out.println(getMap().toString()); 
+        }else{
+            logger.info("Processando jogada do :" + request.getNome());
+            //verifica se o jogador ta no jogo
+            boolean ingame = this.in_game(request.getNome());
+            boolean isplayed = this.is_played(request.getNome());
+            if(!isplayed){
+                logger.info("Primeira vez do " + request.getNome() + " Retornando mapa ...");
+                Play jogada = new Play();
+                jogada.setNome(request.getNome());//setando nome do jogador que efetuou a jogada
+                jogada.setX(request.getCoord(0).getX());//setando coord da jogada
+                jogada.setY(request.getCoord(0).getY());
+                this.jogadas.put(numero_jogadas,jogada);
+                numero_jogadas++;
+                //atualizando pos jogador
+                this.jogadores.get(request.getId()).setX(request.getCoord(0).getX());
+                this.jogadores.get(request.getId()).setY(request.getCoord(0).getY());
+                logger.info("Agora jogador " + this.jogadores.get(request.getId()).getNome() + " foi atualizado!\n" 
+                + request.getCoord(0).getX() +","+ request.getCoord(0).getY());        
+                //atualiza mapa
+                map_message = Mapa.newBuilder().setDados(getMap()).setTamanho(getTamanho_mapa()).build();
+                //atualiza mapa
+                responseObserver.onNext(map_message);
+                responseObserver.onCompleted();
+                return;
+                
+            }
         
-        logger.info("Processando jogada do :" + request.getNome());
-        //verifica se o jogador ta no jogo
-        boolean ingame = this.in_game(request.getNome());
-        boolean isplayed = this.is_played(request.getNome());
-        if(!isplayed){
-            logger.info("Primeira vez do " + request.getNome() + " Retornando mapa ...");
-            Play jogada = new Play();
-            jogada.setNome(request.getNome());//setando nome do jogador que efetuou a jogada
-            jogada.setX(request.getCoord(0).getX());//setando coord da jogada
-            jogada.setY(request.getCoord(0).getY());
-            this.jogadas.put(numero_jogadas,jogada);
-            numero_jogadas++;
-            //atualizando pos jogador
-            this.jogadores.get(request.getId()).setX(request.getCoord(0).getX());
-            this.jogadores.get(request.getId()).setY(request.getCoord(0).getY());
-            logger.info("Agora jogador " + this.jogadores.get(request.getId()).getNome() + " foi atualizado!\n" 
-            + request.getCoord(0).getX() +","+ request.getCoord(0).getY());        
-            //atualiza mapa
-            map = Mapa.newBuilder().setDados(getMap()).setTamanho(getTamanho_mapa()).build();
-            //atualiza mapa
-            responseObserver.onNext(map);
+            if(ingame){
+                System.out.println("O jogador pertence a esse jogo!");
+                System.out.println("Iniciando jogada..."); 
+                Play jogada = new Play();    
+                jogada.setNome(request.getNome());//setando nome do jogador que efetuou a jogada
+                jogada.setX(request.getCoord(0).getX());//setando coord da jogada
+                jogada.setY(request.getCoord(0).getY());//setando coord da jogada                    
+                this.jogadas.put(numero_jogadas,jogada);
+                numero_jogadas++;
+                mensagem = "A Jogada : X:" + request.getCoord(0).getX()
+                + ",Y:" +request.getCoord(0).getY() + 
+                " do " + request.getNome() + " foi adicionada com sucesso!!";
+                if(mapa[jogada.getX()][jogada.getY()] == 66 && !isFim() ){              
+                  logger.info("Jogador " + request.getNome() + " pegou a bandeira!");
+                  logger.info("<<<<<<" + request.getNome() + ">>>> <<<<<VENCEU>>>>>");
+                  logger.info("Fim de jogo");   
+                  setFim(true);           
+                  map_message = Mapa.newBuilder().setInfo("O Jogador " + request.getNome() + " Venceu").build(); 
+                  responseObserver.onNext(map_message);
+                  responseObserver.onCompleted();
+                  return;             
+                }
+                map_message = Mapa.newBuilder().setDados(getMap()).setTamanho(getTamanho_mapa()).build();
+                responseObserver.onNext(map_message);
+                responseObserver.onCompleted();
+            }
+            logger.info(mensagem);
+            this.monta_mapa(false);
+        }       
+    }
+    System.out.println(getMap().toString()); 
+}
+
+//monitor entra
+@Override
+public void mapear(Ingresso request, StreamObserver<Mapa> responseObserver) {
+    if(!isFim()){
+
+        if(!getMap().isEmpty()){
+            Mapa map_message = Mapa.newBuilder().setTamanho(getTamanho_mapa()).setDados(getMap()).build();
+            responseObserver.onNext(map_message);
             responseObserver.onCompleted();
             return;
-            
-        }
-    
-        if(ingame){
-            System.out.println("O jogador pertence a esse jogo!");
-            System.out.println("Iniciando jogada..."); 
-            Play jogada = new Play();    
-            jogada.setNome(request.getNome());//setando nome do jogador que efetuou a jogada
-            jogada.setX(request.getCoord(0).getX());//setando coord da jogada
-            jogada.setY(request.getCoord(0).getY());//setando coord da jogada                    
-            this.jogadas.put(numero_jogadas,jogada);
-            numero_jogadas++;
-            mensagem = "A Jogada : X:" + request.getCoord(0).getX()
-            + ",Y:" +request.getCoord(0).getY() + 
-            " do " + request.getNome() + " foi adicionada com sucesso!!";
-            if(mapa[jogada.getX()][jogada.getY()] == 66){              
-              logger.info("Jogador " + request.getNome() + " pegou a bandeira!");
-              logger.info("<<<<<<" + request.getNome() + ">>>> <<<<<VENCEU>>>>>");
-              logger.info("Fim de jogo");   
-              fim = true;           
-              map = Mapa.newBuilder().setInfo("O Jogador " + request.getNome() + " Venceu").build(); 
-              responseObserver.onNext(map);
-              responseObserver.onCompleted();
-              return;             
-            }
-            this.monta_mapa(false);
-
-            map = Mapa.newBuilder().setDados(getMap()).setTamanho(getTamanho_mapa()).build();
-            responseObserver.onNext(map);
+        }else{
+            Mapa map_message = Mapa.newBuilder().setInfo("Aguardando jogadores").build();
+            responseObserver.onNext(map_message);
             responseObserver.onCompleted();
+            return;
         }
-        //jogada valida e bem sucedida
-        logger.info(mensagem);
-       
+    }else{
+        Mapa map_message = Mapa.newBuilder().setInfo("Fim").build();
+        responseObserver.onNext(map_message);
+        responseObserver.onCompleted();
+        return;
     }
 
 }
@@ -248,6 +298,7 @@ public void monta_mapa(boolean first){
     String mapa_str = "";    
     //alocando jogadores
     //reseta mapa
+    
     if(first){
         for(int i = 0; i < getNumero_jogadores(); i++){
             if(mapa[this.jogadores.get(i).getX()][this.jogadores.get(i).getY()] == 0){        
@@ -255,6 +306,9 @@ public void monta_mapa(boolean first){
             }
         }
         aloca_bandeiras();
+        for (int i = 0; i < getMax_bandeiras(); i++) {
+            mapa[getBandeiras().get(i).getX()][getBandeiras().get(i).getY()] = 66;
+        }
     }else{     
         for (int i = 0; i < getTamanho_mapa(); i++) {
             for (int j = 0; j < getTamanho_mapa(); j++) {
@@ -262,7 +316,7 @@ public void monta_mapa(boolean first){
             }
         }
         for (int i = 0; i < getMax_bandeiras(); i++) {
-            mapa[pos_bandeira[i][0]][pos_bandeira[i][1]] = 66;
+            mapa[getBandeiras().get(i).getX()][getBandeiras().get(i).getY()] = 66;
         }
         //realoca jogadores na posicao atualizada
         for(int i = 0; i < getNumero_jogadores(); i++){             
@@ -286,21 +340,18 @@ public void monta_mapa(boolean first){
 }
 
 public void aloca_bandeiras(){
+    
     Random rand = new Random();
     for(int i=0;i < getMax_bandeiras();i++){
         int x = rand.nextInt(getTamanho_mapa());
         int y = rand.nextInt(getTamanho_mapa());        
-        if(mapa[x][y] == 0){
-           if(numero_bandeiras == getMax_bandeiras()){
+        if(mapa[x][y] != 66 && mapa[x][y] == 0){
+           if(getMax_bandeiras() == getBandeiras().size()){
                 return;
-            }else{
-               mapa[x][y] = 66;
-               pos_bandeira[i][0] = x;
-               pos_bandeira[i][1] = y;
-               numero_bandeiras++;
-            }
-        }else{
-            aloca_bandeiras();
+           }else{
+               Bandeira b = new Bandeira(x,y);
+               getBandeiras().add(b);
+           }
         }
     }
 }
