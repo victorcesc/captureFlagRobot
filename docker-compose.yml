@@ -1,0 +1,28 @@
+version: '3.3'
+services:
+    auditor:
+        build:
+          context: ./Auditor
+        container_name: auditor
+        network_mode: rpc
+        image: auditor
+    jogador:
+        build:
+          context: ./Jogador
+          args:
+            IP_SERVER: auditor
+            PORT: 50051
+            NOME: Jogador1
+        container_name: jogador
+        network_mode: rpc
+        image: jogador
+    jogador2:
+        build:
+          context: ./Jogador
+          args:
+            IP_SERVER: auditor
+            PORT: 50051
+            NOME: Jogador2
+        container_name: jogador2
+        network_mode: rpc
+        image: jogador2

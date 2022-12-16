@@ -18,16 +18,16 @@
 
 #### Para buildar o container auditor(modo DEFAULT*):
 
-``` sudo docker build . -t auditor ```
+``` docker build . -t auditor ```
 
 #### Para buildar o container auditor com specs:
- ``` sudo docker build . -t auditor --build-arg PORT=<port> --build-arg PLAYERS=<number>  --build-arg FLAGS=<number> --build-arg MAP=<number> ```
+ ``` docker build . -t auditor --build-arg PORT=<port> --build-arg PLAYERS=<number>  --build-arg FLAGS=<number> --build-arg MAP=<number> ```
 
 
 ### Run Auditor:
 
 #### Para executar o container auditor :
-``` sudo docker run --name <nome_servidor_container> --network <nome_rede> auditor ```
+``` docker run --name <nome_servidor_container> --network <nome_rede> auditor ```
 
 
 
@@ -37,16 +37,16 @@
 ### Build Jogador
 
 #### Para compilar o container jogador(modo DEFAULT*):
- ``` sudo docker build . -t jogador --build-arg NOME=<nome_jogador> ```
+ ``` docker build . -t jogador --build-arg NOME=<nome_jogador> ```
 
 #### Para compilar o container jogador:
- ``` sudo docker build . -t jogador --build-arg NOME=<nome_jogador> --build-arg IP_SERVER=<nome_servidor_container> --build-arg PORT=<number> ```
+ ``` docker build . -t jogador --build-arg NOME=<nome_jogador> --build-arg IP_SERVER=<nome_servidor_container> --build-arg PORT=<number> ```
 
 ### Run Jogador
 
 #### Para excecutar o container jogador:
 
-``` sudo docker run --name <nome_container> --network <nome_rede> jogador ```
+``` docker run --name <nome_container> --network <nome_rede> jogador ```
 
 * O Modo default para o auditor:
   - porta do servidor : 50051
@@ -59,8 +59,11 @@
   - servidor e porta que ira se conectar : localhost:50051
 
 
-* NOTE : para concetar ao auditor utilizando o modo de nomes de container precisa-se criar o jogador em modo custom e adicionar na variavel SERVIDOR o nome do container e não em modo default, como dito acima, o modo default só aceita conexões do localhost.
-
+* NOTE : Para conectar ao auditor utilizando o modo de nomes de container precisa-se criar o jogador em modo custom e adicionar na variavel SERVIDOR o nome do container e não em modo default, como dito acima, o modo default só aceita conexões do localhost. Outra opção é utilizar o docker compose : 
+``` docker compose up auditor```
+``` docker compose up jogador```
+``` docker compose up jogador2```
+* Todos os comandos acima devem ser executados na pasta raiz do projeto
 
 ## Requisitos atendidos:
 
