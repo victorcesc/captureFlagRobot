@@ -26,3 +26,12 @@ services:
         container_name: jogador2
         network_mode: rpc
         image: jogador2
+    monitor:
+        build:
+          context: ./Monitor
+          args:
+            IP_SERVER: auditor
+            PORT: 50051
+        container_name: monitor
+        network_mode: rpc
+        image: monitor

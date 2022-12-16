@@ -22,9 +22,12 @@ private static final Logger logger = Logger.getLogger(App.class.getName());
 public static void main(String[] args) throws Exception {
 
       //String map = "1,0,0;0,0,0;66,0,2";
-     
     String port = "50051";
-    String server = "localhost:"+port;   
+    String server = "localhost:"+port;
+    if(args.length > 0){
+        server = args[0] + ":" + args[1];
+    } 
+       
     var channel = ManagedChannelBuilder.forTarget(server).usePlaintext().build();
     var ingresso = Ingresso.newBuilder().setNome("monitor").build();
     var auditorBlockingStub = AuditorGrpc.newBlockingStub(channel);

@@ -217,7 +217,7 @@ public void jogar(Jogada request, StreamObserver<Mapa> responseObserver) {
                 mensagem = "A Jogada : X:" + request.getCoord(0).getX()
                 + ",Y:" +request.getCoord(0).getY() + 
                 " do " + request.getNome() + " foi adicionada com sucesso!!";
-                if(mapa[jogada.getX()][jogada.getY()] == 66 && !isFim() ){              
+                if(mapa[this.jogadores.get(request.getId()).getX()][this.jogadores.get(request.getId()).getY()] == 66 && !isFim() ){              
                   logger.info("Jogador " + request.getNome() + " pegou a bandeira!");
                   logger.info("<<<<<<" + request.getNome() + ">>>> <<<<<VENCEU>>>>>");
                   logger.info("Fim de jogo");   
@@ -342,7 +342,6 @@ public void monta_mapa(boolean first){
 }
 
 public void aloca_bandeiras(){
-    
     Random rand = new Random();
     for(int i=0;i < getMax_bandeiras();i++){
         int x = rand.nextInt(getTamanho_mapa());

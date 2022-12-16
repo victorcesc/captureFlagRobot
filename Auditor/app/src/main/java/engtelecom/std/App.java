@@ -12,7 +12,7 @@ if(args.length < 1 && args.length < 4){
     System.out.println("Jogo iniciado no modo padrao: ");
     System.out.println("Porta do servidor : 50051");
     System.out.println("Jogadores max: 2");
-    System.out.println("Tamanho do mapa : 4");
+    System.out.println("Tamanho do mapa : 3x3");
     System.out.println("Numero de bandeiras: 1");
     auditor = new AuditorImpl();
     servidor = ServerBuilder.forPort(50051)
