@@ -105,4 +105,3 @@
 
 ### Processo Auditor não atendeu todos os requisitos - não testado com mais de 2 jogadores e mais de 1 bandeira
 ### Processo Monitor não é grafico
-### Só consegui testar o jogo em modo default.
