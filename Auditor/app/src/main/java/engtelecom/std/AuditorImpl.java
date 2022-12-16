@@ -192,8 +192,9 @@ public void jogar(Jogada request, StreamObserver<Mapa> responseObserver) {
                 //atualizando pos jogador
                 this.jogadores.get(request.getId()).setX(request.getCoord(0).getX());
                 this.jogadores.get(request.getId()).setY(request.getCoord(0).getY());
-                logger.info("Agora jogador " + this.jogadores.get(request.getId()).getNome() + " foi atualizado!\n" 
-                + request.getCoord(0).getX() +","+ request.getCoord(0).getY());        
+                
+                //logger.info("Agora jogador " + this.jogadores.get(request.getId()).getNome() + " foi atualizado!\n" 
+                //+ request.getCoord(0).getX() +","+ request.getCoord(0).getY());        
                 //atualiza mapa
                 map_message = Mapa.newBuilder().setDados(getMap()).setTamanho(getTamanho_mapa()).build();
                 //atualiza mapa
@@ -212,7 +213,8 @@ public void jogar(Jogada request, StreamObserver<Mapa> responseObserver) {
                 jogada.setY(request.getCoord(0).getY());//setando coord da jogada                    
                 this.jogadas.put(numero_jogadas,jogada);
                 this.jogadores.get(request.getId()).setX(request.getCoord(0).getX());//atualiza jogador
-                this.jogadores.get(request.getId()).setX(request.getCoord(0).getY());
+                this.jogadores.get(request.getId()).setY(request.getCoord(0).getY());
+                System.out.println("Jogador atualizado : " + this.jogadores.get(request.getId()).toString());
                 numero_jogadas++;
                 mensagem = "A Jogada : X:" + request.getCoord(0).getX()
                 + ",Y:" +request.getCoord(0).getY() + 
@@ -350,6 +352,7 @@ public void aloca_bandeiras(){
            if(getMax_bandeiras() == getBandeiras().size()){
                 return;
            }else{
+               System.out.println("ADICIONOU BANDEIRA");
                Bandeira b = new Bandeira(x,y);
                getBandeiras().add(b);
            }

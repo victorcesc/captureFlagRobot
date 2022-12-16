@@ -105,6 +105,7 @@ public static void main(String[] args) throws Exception {
             tenho_mapa = true;
             System.out.println("Mapa : "+ map.getDados().toString());
             LinkedList<Cell> c = caminho(map.getDados().toString(),map.getTamanho(),x,y);
+            System.out.println("Caminho : " + c.toString());
             for (int i = 0; i < c.size(); i++) {
               int xc = c.get(i).getX();
               int yc = c.get(i).getY();
@@ -120,12 +121,15 @@ public static void main(String[] args) throws Exception {
           return;
         }  
       }   
-    }    
+    }
+    int [] xy = {0,0};    
     while(true){
       try{
         Thread.sleep(1500);
         //colocar cordenadas da proxima jogada por queue        
-        int [] xy = queue.poll();
+        if(!queue.isEmpty()){
+          xy = queue.poll();
+        }        
         Coordenadas coord = Coordenadas.newBuilder().setX(xy[0]).setY(xy[1]).build();
         var jogada = Jogada.newBuilder().setNome(user)
         .addCoord(coord)
