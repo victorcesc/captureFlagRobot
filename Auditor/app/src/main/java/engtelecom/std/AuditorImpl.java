@@ -211,6 +211,8 @@ public void jogar(Jogada request, StreamObserver<Mapa> responseObserver) {
                 jogada.setX(request.getCoord(0).getX());//setando coord da jogada
                 jogada.setY(request.getCoord(0).getY());//setando coord da jogada                    
                 this.jogadas.put(numero_jogadas,jogada);
+                this.jogadores.get(request.getId()).setX(request.getCoord(0).getX());//atualiza jogador
+                this.jogadores.get(request.getId()).setX(request.getCoord(0).getY());
                 numero_jogadas++;
                 mensagem = "A Jogada : X:" + request.getCoord(0).getX()
                 + ",Y:" +request.getCoord(0).getY() + 
@@ -241,7 +243,7 @@ public void jogar(Jogada request, StreamObserver<Mapa> responseObserver) {
 public void mapear(Ingresso request, StreamObserver<Mapa> responseObserver) {
     if(!isFim()){
 
-        if(!getMap().isEmpty()){
+        if(getMap() != null){
             Mapa map_message = Mapa.newBuilder().setTamanho(getTamanho_mapa()).setDados(getMap()).build();
             responseObserver.onNext(map_message);
             responseObserver.onCompleted();

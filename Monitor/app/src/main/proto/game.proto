@@ -1,0 +1,60 @@
+syntax = "proto3";
+package game;
+import "google/protobuf/timestamp.proto";
+// Para indicar que a compilação deverá gerar múltiplos arquivos .java
+option java_multiple_files = true;
+// Para indicar o nome do pacote das classes Java que serão geradas quando for compilado para ←-
+option java_package = "engtelecom.std.game";
+// Para indicar o nome da classe Java que será gerada na compilação
+option java_outer_classname = "GameProtos";
+// Definição das estruturas de dados para representar uma Pessoa
+message Jogada {
+    //nome do Jogador  e identificador unico
+    int32 id = 1;
+    string nome = 2;
+    //coordenadas que foram passadas para efetuar a jogada
+    //se coordenadas forem fora de alcance retornar erro
+
+    //so posso andar  + 1 para x ou +1 para y
+    //no caso de voltar pra posicao seria a mesma logica, -1 para x ou -1 para y
+    //mas nao da de voltar caso tenha 0 em algum dos x,y
+    message Coordenadas {
+        int32 x = 1;
+        int32 y = 2;
+    }
+    // message Mapa {
+    //     string dados = 1;
+    // }
+    // para indicar que um contato poderá ter vários telefones
+    //repeated NumeroTelefone telefones = 4;
+    repeated Coordenadas coord = 3; 
+
+    // repeated Mapa data = 5; 
+    // para registrar quando o contato foi criado
+    google.protobuf.Timestamp last_updated = 4;
+}
+
+
+message Mapa{
+    int32 tamanho = 1;
+    string dados = 2;
+    string info = 3;
+}
+
+message Resposta{
+    int32 id = 1;
+    int32 x = 2;
+    int32 y = 3;
+}
+
+message Ingresso{
+    string nome = 1;
+}
+
+
+// Definição da interface do serviço (métodos que poderão ser invocados)
+service Auditor {
+    rpc entrar (Ingresso) returns (Resposta) {}
+    rpc jogar (Jogada) returns (Mapa) {}
+    rpc mapear (Ingresso) returns (Mapa){} //exclusivo do monitor
+}
