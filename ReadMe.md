@@ -1,9 +1,8 @@
-# PROJETO FINAL STD
+# CAPTURE A BANDEIRA EM JAVA
 
 ## Requer:
-### gradle 7.6
-### JAVA 19
 ### Docker version 20.10.21, build baeda1f82a
+### Docker compose 3.3
 
 (ignore os sudos se vc tem o docker instalado localmente como user)
 ### Criando a rede docker necessária:
@@ -81,8 +80,7 @@
   - Servidor e porta que ira se conectar : localhost:50051
 
 
-
-* NOTE : Para conectar ao auditor utilizando o modo de nomes de container precisa-se criar o jogador em modo custom e adicionar na variavel SERVIDOR o nome do container e não em modo default, como dito acima, o modo default só aceita conexões do localhost. Outra opção é utilizar o docker compose : 
+* NOTE : Para conectar ao auditor utilizando o modo de nomes de container precisa-se criar o jogador em modo CUSTOM e adicionar na variavel IP_SERVIDOR o ip do container, como dito acima, o modo default só aceita conexões do localhost. Outra opção é utilizar o docker compose : 
 
 ## Docker Compose
 
@@ -92,16 +90,9 @@
 ``` docker compose up jogador2 ```
 * Todos os comandos acima devem ser executados na pasta raiz do projeto
 
-## Requisitos atendidos:
-
-###  Arquivo Readme.md contém explicações em como executar cada processo para permitir iniciar e observar uma partida
-###  Arquivo Readme.md contém uma lista dos requisitos atendidos e não atendidos
-### Após clonar o repositório, é possível compilar e executar cada projeto de forma individual (auditor,jogador ou monitor) usando o gradle (pode ser com gradle run ou gradle installDist)
-### É possível executar somente o contêiner com o processo auditor
-### É possível executar 2 contêineres com o processo jogador e esses conseguem conectar corretamente no processo auditor
-### É possível executar corretamente o monitor e esse consegue conectar corretamente no processo monitor
-
-## Requisitos não atendidos:
-
-### Processo Auditor não atendeu todos os requisitos - não testado com mais de 2 jogadores e mais de 1 bandeira
-### Processo Monitor não é grafico
+- Arquivo Readme.md contém explicações em como executar cada processo para permitir iniciar e observar uma partida
+- É possível executar somente o contêiner com o processo auditor
+- É possível executar 2 contêineres com o processo jogador e esses conseguem conectar corretamente no processo auditor
+- É possível executar corretamente o monitor e esse consegue conectar corretamente no processo monitor
+- Não testado com mais de 2 jogadores e mais de 1 bandeira
+- Processo Monitor não é grafico
